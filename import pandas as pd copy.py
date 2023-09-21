@@ -36,25 +36,14 @@ with open('stations.txt', 'r') as fichier:
 # Créez un DataFrame à partir de la liste des lignes
 df = pd.DataFrame({'texte': lignes})   
 
-#supprime les lignes de moins de 45 caracteres
+#supprime les lignes vides
 df.dropna()
-
-#supprime les lignes de moins de 45 caracteres
-df = df[df['texte'].apply(lambda x: len(x) >= 45)]
-df.reset_index(drop=True, inplace=True)
 
 #supprime les lignes qui commencent par !
 df = df[~df['texte'].str.startswith('!')]
 
-#supprime les lignes dont le premier mot contient plus de deux caracteres
-df = df[df['texte'].apply(lambda x: len(x.split()[0]) <= 2)]
-df.reset_index(drop=True, inplace=True)
-
-# supprimer les lignes qui commencentt par CD STATION
-masque = ~df['texte'].str.startswith('CD STATION')
-# Appliquez le masque pour filtrer les lignes du DataFrame
-df = df[masque]
-# Réindexez le DataFrame résultant
-df.reset_index(drop=True, inplace=True)
-
+df['Nom'] = df['texte'].str.slice(2, 20)
+df['Code'] = df['texte'].str.slice(20, 24)
+df = df.drop(columns=['texte'])
 print(df)
+df.to_csv('stations.csv', index=False)
